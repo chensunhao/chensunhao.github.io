@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>使用Spring构建一个 RESTful Web Service | 沉寂头颅</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="Spring官方英文原文：Building a RESTful Web Service
+
+构建目标构建一个如下接收HTTP GET请求的的服务
+http://localhost:8080/greeting
+并且返回用于描述greeting内容的JSON数据
+1&amp;#123;&quot;id&quot;:1,&quot;content&quot;:&quot;Hello, World!&quot;&amp;#125;
+你也可以自定义一个可选的name参数来定制返回的问">
+<meta property="og:type" content="article">
+<meta property="og:title" content="使用Spring构建一个 RESTful Web Service">
+<meta property="og:url" content="chensunhao@github.io/2015/08/04/使用Spring构建一个 RESTful Web Service/index.html">
+<meta property="og:site_name" content="沉寂头颅">
+<meta property="og:description" content="Spring官方英文原文：Building a RESTful Web Service
+
+构建目标构建一个如下接收HTTP GET请求的的服务
+http://localhost:8080/greeting
+并且返回用于描述greeting内容的JSON数据
+1&amp;#123;&quot;id&quot;:1,&quot;content&quot;:&quot;Hello, World!&quot;&amp;#125;
+你也可以自定义一个可选的name参数来定制返回的问">
+<meta property="og:updated_time" content="2015-08-04T14:26:07.228Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="使用Spring构建一个 RESTful Web Service">
+<meta name="twitter:description" content="Spring官方英文原文：Building a RESTful Web Service
+
+构建目标构建一个如下接收HTTP GET请求的的服务
+http://localhost:8080/greeting
+并且返回用于描述greeting内容的JSON数据
+1&amp;#123;&quot;id&quot;:1,&quot;content&quot;:&quot;Hello, World!&quot;&amp;#125;
+你也可以自定义一个可选的name参数来定制返回的问">
+  
+    <link rel="alternative" href="/atom.xml" title="沉寂头颅" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css" type="text/css">
+<script>
+var _hmt = _hmt || [];
+(function() {
+  var hm = document.createElement("script");
+  hm.src = "//hm.baidu.com/hm.js?6a263a550229abf7d7777feaa2f0555b";
+  var s = document.getElementsByTagName("script")[0]; 
+  s.parentNode.insertBefore(hm, s);
+})();
+</script>
+</head>
+<body>
+  <div id="container">
+    <div class="left-col">
+    <div class="overlay"></div>
+<div class="intrude-less">
+	<header id="header" class="inner">
+		<a href="/" class="profilepic">
+			
+			<img lazy-src="/img/logo.png" class="js-avatar">
+			
+		</a>
+
+		<hgroup>
+		  <h1 class="header-author"><a href="/">沉寂头颅</a></h1>
+		</hgroup>
+
+		
+		<p class="header-subtitle">深山老码农</p>
+		
+
+		
+			<div class="switch-btn">
+				<div class="icon">
+					<div class="icon-ctn">
+						<div class="icon-wrap icon-house" data-idx="0">
+							<div class="birdhouse"></div>
+							<div class="birdhouse_holes"></div>
+						</div>
+						<div class="icon-wrap icon-ribbon hide" data-idx="1">
+							<div class="ribbon"></div>
+						</div>
+						
+						<div class="icon-wrap icon-link hide" data-idx="2">
+							<div class="loopback_l"></div>
+							<div class="loopback_r"></div>
+						</div>
+						
+						
+						<div class="icon-wrap icon-me hide" data-idx="3">
+							<div class="user"></div>
+							<div class="shoulder"></div>
+						</div>
+						
+					</div>
+					
+				</div>
+				<div class="tips-box hide">
+					<div class="tips-arrow"></div>
+					<ul class="tips-inner">
+						<li>菜单</li>
+						<li>标签</li>
+						
+						<li>友情链接</li>
+						
+						
+						<li>关于我</li>
+						
+					</ul>
+				</div>
+			</div>
+		
+
+		<div class="switch-area">
+			<div class="switch-wrap">
+				<section class="switch-part switch-part1">
+					<nav class="header-menu">
+						<ul>
+						
+							<li><a href="/">主页</a></li>
+				        
+							<li><a href="/archives">所有文章</a></li>
+				        
+						</ul>
+					</nav>
+					<nav class="header-nav">
+						<div class="social">
+							
+								<a class="github" target="_blank" href="https://github.com/chensunhao" title="github">github</a>
+					        
+								<a class="weibo" target="_blank" href="http://weibo.com/ycysth" title="weibo">weibo</a>
+					        
+								<a class="mail" target="_blank" href="/chensunhao@gmail.com" title="mail">mail</a>
+					        
+								<a class="rss" target="_blank" href="http://chensunhao.github.io/atom.xml" title="rss">rss</a>
+					        
+						</div>
+					</nav>
+				</section>
+				
+				
+				<section class="switch-part switch-part2">
+					<div class="widget tagcloud" id="js-tagcloud">
+						<a href="/tags/Hadoop/" style="font-size: 10px;">Hadoop</a> <a href="/tags/Spring-Restful/" style="font-size: 10px;">Spring Restful</a>
+					</div>
+				</section>
+				
+				
+				
+				<section class="switch-part switch-part3">
+					<div id="js-friends">
+					
+			          <a target="_blank" class="main-nav-link switch-friends-link" href="http://sunxiang0918.cn/">翔妖除魔的博客</a>
+			        
+			        </div>
+				</section>
+				
+
+				
+				
+				<section class="switch-part switch-part4">
+				
+					<div id="js-aboutme">深山老码农</div>
+				</section>
+				
+			</div>
+		</div>
+	</header>				
+</div>
+    </div>
+    <div class="mid-col">
+      <nav id="mobile-nav">
+  	<div class="overlay">
+  		<div class="slider-trigger"></div>
+  		<h1 class="header-author js-mobile-header hide">沉寂头颅</h1>
+  	</div>
+	<div class="intrude-less">
+		<header id="header" class="inner">
+			<div class="profilepic">
+				<img lazy-src="/img/logo.png" class="js-avatar">
+			</div>
+			<hgroup>
+			  <h1 class="header-author">沉寂头颅</h1>
+			</hgroup>
+			
+			<p class="header-subtitle">深山老码农</p>
+			
+			<nav class="header-menu">
+				<ul>
+				
+					<li><a href="/">主页</a></li>
+		        
+					<li><a href="/archives">所有文章</a></li>
+		        
+		        <div class="clearfix"></div>
+				</ul>
+			</nav>
+			<nav class="header-nav">
+				<div class="social">
+					
+						<a class="github" target="_blank" href="https://github.com/chensunhao" title="github">github</a>
+			        
+						<a class="weibo" target="_blank" href="http://weibo.com/ycysth" title="weibo">weibo</a>
+			        
+						<a class="mail" target="_blank" href="/chensunhao@gmail.com" title="mail">mail</a>
+			        
+						<a class="rss" target="_blank" href="http://chensunhao.github.io/atom.xml" title="rss">rss</a>
+			        
+				</div>
+			</nav>
+		</header>				
+	</div>
+</nav>
+      <div class="body-wrap"><article id="post-使用Spring构建一个 RESTful Web Service" class="article article-type-post" itemscope itemprop="blogPost">
+  
+    <div class="article-meta">
+      <a href="/2015/08/04/使用Spring构建一个 RESTful Web Service/" class="article-date">
+  	<time datetime="2015-08-04T14:23:54.000Z" itemprop="datePublished">2015-08-04</time>
+</a>
+    </div>
+  
+  <div class="article-inner">
+    
+      <input type="hidden" class="isFancy" />
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      使用Spring构建一个 RESTful Web Service
+    </h1>
+  
+
+      </header>
+      
+      <div class="article-info article-info-post">
+        
+	<div class="article-tag tagcloud">
+		<ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Spring-Restful/">Spring Restful</a></li></ul>
+	</div>
+
+        
+
+        <div class="clearfix"></div>
+      </div>
+      
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><em>Spring官方英文原文：<a href="http://spring.io/guides/gs/rest-service/" target="_blank" rel="external">Building a RESTful Web Service</a></em></p>
+<hr>
+<h2 id="构建目标">构建目标</h2><p>构建一个如下接收<code>HTTP GET</code>请求的的服务</p>
+<pre><code><span class="string">http:</span><span class="comment">//localhost:8080/greeting</span>
+</code></pre><p>并且返回用于描述<code>greeting</code>内容的JSON数据</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">1</span></span>,"<span class="attribute">content</span>":<span class="value"><span class="string">"Hello, World!"</span></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>你也可以自定义一个可选的<code>name</code>参数来定制返回的问候语</p>
+<pre><code><span class="string">http:</span><span class="comment">//localhost:8080/greeting?name=User</span>
+</code></pre><p>带上<code>name</code>参数条件后返回结果会将原来的<code>World</code>替换</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">1</span></span>,"<span class="attribute">content</span>":<span class="value"><span class="string">"Hello, User!"</span></span>&#125;</span><br></pre></td></tr></table></figure>
+<hr>
+<h2 id="环境准备">环境准备</h2><ul>
+<li>任意Java IDE</li>
+<li>JDK 1.7+</li>
+<li>Maven 2.0+</li>
+<li>Spring 4+</li>
+</ul>
+<h2 id="如何完成">如何完成</h2><p>和大多数Spring入门教程相同，你可以一步一步来，或者跳过你已熟悉的基本设置步骤，无论何种方式，最终将得到可正常运行的代码。<br>如果一步一步来，直接跳到下一节（使用Maven构建工程）<br>如果跳过可直接clone如下代码</p>
+<pre><code>git clone <span class="string">https:</span><span class="comment">//github.com/spring-guides/gs-rest-service.git</span>
+</code></pre><h2 id="使用Maven构建工程">使用Maven构建工程</h2><p>在选的的工程目录下，建立如下子目录结构</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">└── src</span><br><span class="line">    └── main</span><br><span class="line">        └── java</span><br><span class="line">            └── hello</span><br></pre></td></tr></table></figure>
+<p>pom.xml文件内容</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br></pre></td><td class="code"><pre><span class="line"><span class="pi">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="title">project</span> <span class="attribute">xmlns</span>=<span class="value">"http://maven.apache.org/POM/4.0.0"</span> <span class="attribute">xmlns:xsi</span>=<span class="value">"http://www.w3.org/2001/XMLSchema-instance"</span></span><br><span class="line">    <span class="attribute">xsi:schemaLocation</span>=<span class="value">"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">modelVersion</span>&gt;</span>4.0.0<span class="tag">&lt;/<span class="title">modelVersion</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>gs-rest-service<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">version</span>&gt;</span>0.1.0<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">parent</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>spring-boot-starter-parent<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">version</span>&gt;</span>1.2.5.RELEASE<span class="tag">&lt;/<span class="title">version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">parent</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">dependencies</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">dependency</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>spring-boot-starter-web<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">dependencies</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">properties</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">java.version</span>&gt;</span>1.8<span class="tag">&lt;/<span class="title">java.version</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">properties</span>&gt;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">build</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">plugins</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">plugin</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="title">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="title">groupId</span>&gt;</span></span><br><span class="line">                <span class="tag">&lt;<span class="title">artifactId</span>&gt;</span>spring-boot-maven-plugin<span class="tag">&lt;/<span class="title">artifactId</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;/<span class="title">plugin</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">plugins</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">build</span>&gt;</span></span><br><span class="line"></span><br><span class="line">    <span class="tag">&lt;<span class="title">repositories</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">repository</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">id</span>&gt;</span>spring-releases<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">url</span>&gt;</span>https://repo.spring.io/libs-release<span class="tag">&lt;/<span class="title">url</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">repository</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">repositories</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="title">pluginRepositories</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="title">pluginRepository</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">id</span>&gt;</span>spring-releases<span class="tag">&lt;/<span class="title">id</span>&gt;</span></span><br><span class="line">            <span class="tag">&lt;<span class="title">url</span>&gt;</span>https://repo.spring.io/libs-release<span class="tag">&lt;/<span class="title">url</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;/<span class="title">pluginRepository</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="title">pluginRepositories</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="title">project</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="创建一个资源描述类">创建一个资源描述类</h2><p>有了工程目录和Maven之后，可以开始创建 web service。<br>首先考虑服务间交互（service interactions）。<br>这个服务要处理greeting的GET请求，其可包含一个可选的<code>name</code> 参数。这个请求应当返回一个状态为<code>200 OK</code> 的响应，body中包含描述greeting内容的JSON字符串，如下：<br><figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    "<span class="attribute">id</span>": <span class="value"><span class="number">1</span></span>,</span><br><span class="line">    "<span class="attribute">content</span>": <span class="value"><span class="string">"Hello, World!"</span></span><br><span class="line"></span>&#125;</span><br></pre></td></tr></table></figure></p>
+<p>其中<code>id</code>是greeting内容的唯一标识，<code>content</code>是greeting内容的文本描述字段。</p>
+<p>为了多greeting响应建模，可以创建一个资源描述类。提供一个包含field，constructors，getter/setter的java对象：</p>
+<p><code>src/main/java/hello/Greeting.java</code></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hello;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Greeting</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> <span class="keyword">long</span> id;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> String content;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Greeting</span><span class="params">(<span class="keyword">long</span> id, String content)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.id = id;</span><br><span class="line">        <span class="keyword">this</span>.content = content;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">long</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> id;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getContent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> content;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>如上所见，Spring使用了Jackson JSON类库自动生成greeting对象的JSON字符串。</p>
+</blockquote>
+<h2 id="创建资源类控制器">创建资源类控制器</h2><p>在使用Spring构建RESTful web services的时候，使用资源类控制器来处理http请求。资源控制类可以通过<code>@RestController</code> 注解来定义，下面的GreetingController控制器处理来自<code>/greeting</code> 的GET请求并返回一个Greeting类的实例：</p>
+<pre><code>src<span class="regexp">/main/</span>java<span class="regexp">/hello/G</span>reetingController.java
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hello;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.util.concurrent.atomic.AtomicLong;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestMapping;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RequestParam;</span><br><span class="line"><span class="keyword">import</span> org.springframework.web.bind.annotation.RestController;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@RestController</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">GreetingController</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String template = <span class="string">"Hello, %s!"</span>;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">final</span> AtomicLong counter = <span class="keyword">new</span> AtomicLong();</span><br><span class="line"></span><br><span class="line">    <span class="annotation">@RequestMapping</span>(<span class="string">"/greeting"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> Greeting <span class="title">greeting</span><span class="params">(@RequestParam(value=<span class="string">"name"</span>, defaultValue=<span class="string">"World"</span>)</span> String name) </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> Greeting(counter.incrementAndGet(),</span><br><span class="line">                            String.format(template, name));</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这个控制类简单明了，但内部做了大量的处理，我们一步一步来分析下。</p>
+<p><code>@RequestMapping</code>注解确保来自<code>/greeting</code>的HTTP请求能映射到greeting()方法上。</p>
+<p>上述例子中并没有指定 GET/PUT/POST 等HTTP操作类型，因为注解<code>@RequestMapping</code> 默认映射所有的HTTP 操作类型。使用<code>@RequestMapping(method=GET)</code> 方式来限定类型只能是GET。</p>
+<p>使用<code>@RequestParam</code>可将请求参数<code>name</code>的值绑定到<code>greeting</code> 方法的参数上。该参数不是必须的，如果请求中不包含该参数，将使用默认的<code>World</code>。</p>
+<p>实现的方法体重创建并返回一个新的Greeting对象，其中并且id实现自增，content根据请求name来构造返回。</p>
+<p>一个传统的MVC控制器和RESTful web service控制器关键区别在于对HTTP请求响应内容的创建方式。RESTful web service不是依靠视图技术来包装greeting对象并传递到HTML上，而是直接将Greeting数据内容转换成一个JSON对象直接响应到HTTP response中。</p>
+<p>使用Spring4+才有的<code>@RestController</code>注解方式，可直接将返回内容放在HTTP response中，而不是原来的返回到一个HTML页面的方式，它轻易的将请求和响应处理融合在了一起。</p>
+<p>Greeting对象必须转换成JSON字符串，有了Spring的消息转换支持，你不需要手动进行转换。转换类<code>MappingJackson2HttpMessageConverter</code>将自动进行这一操作。</p>
+<h2 id="运行程序">运行程序</h2><p>虽然可以将本服务打成一个WAR包并部署到应用服务器，但更简单的办法是创建一个独立的程序。将所有程序打包成一个可运行的JAR包文件，使用main()方式作为入库执行。使用Spring中嵌入的Tomcat servlet容器替代部原有方式作为运行时环境。</p>
+<pre><code>src<span class="regexp">/main/</span>java<span class="regexp">/hello/</span>Application.java
+</code></pre><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> hello;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.SpringApplication;</span><br><span class="line"><span class="keyword">import</span> org.springframework.boot.autoconfigure.SpringBootApplication;</span><br><span class="line"></span><br><span class="line"><span class="annotation">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><code>@SpringBootApplication</code>是一个很简洁的注解，和下面注解实现的功能一致。</p>
+<ul>
+<li><code>@Configuration</code>用于定义一个加入到Spring上下文的注解。</li>
+<li><code>@EnableAutoConfiguration</code>告诉Spring添加基于classpath设置的bean。<br>正常情况下需要为一个Spring MVC程序设置<code>@EnableWebMvc</code> 来告诉Spring需要加入classpath，但使用<code>@EnableAutoConfiguration</code> Spring将自动加入。这如同之前配置的DispatcherServlet行为一样。</li>
+<li><code>@ComponentScan</code> 让Spring在hello包下寻找组件，配置和服务类下找到HelloController类。<br>main方法中使用<code>SpringApplication.run()</code> 方法来启动程序。注意该程序没有任何XML配置文件，也没有web.xml文件。该程序只有Java代码不需要其他任何的设置。</li>
+</ul>
+<p>将程序编译成JAR包并执行：</p>
+<pre><code>java -jar build/libs/gs-rest-service-<span class="number">0.1</span><span class="number">.0</span>.jar
+</code></pre><h2 id="测试服务">测试服务</h2><p>运行JAR包后，直接访问地址<a href="http://localhost:8080/greeting将得到如下反馈：" target="_blank" rel="external">http://localhost:8080/greeting将得到如下反馈：</a></p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">1</span></span>,"<span class="attribute">content</span>":<span class="value"><span class="string">"Hello, World!"</span></span>&#125;</span><br></pre></td></tr></table></figure>
+<p>将<code>name</code>作为请求参数传入，将得到如下反馈：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&#123;"<span class="attribute">id</span>":<span class="value"><span class="number">2</span></span>,"<span class="attribute">content</span>":<span class="value"><span class="string">"Hello, User!"</span></span>&#125;</span><br></pre></td></tr></table></figure>
+
+      
+    </div>
+    
+  </div>
+  
+    
+<nav id="article-nav">
+  
+  
+    <a href="/2015/08/01/Hadoop2.6.0集群部署说明/" id="article-nav-older" class="article-nav-link-wrap">
+      <div class="article-nav-title">Hadoop 2.6.0 集群部署说明</div>
+      <strong class="article-nav-caption">></strong>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+<div class="share">
+	<!-- JiaThis Button BEGIN -->
+	<div class="jiathis_style">
+		<span class="jiathis_txt">分享到：</span>
+		<a class="jiathis_button_tsina"></a>
+		<a class="jiathis_button_cqq"></a>
+		<a class="jiathis_button_douban"></a>
+		<a class="jiathis_button_weixin"></a>
+		<a class="jiathis_button_tumblr"></a>
+		<a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a>
+	</div>
+	<script type="text/javascript" src="http://v3.jiathis.com/code/jia.js?uid=1405949716054953" charset="utf-8"></script>
+	<!-- JiaThis Button END -->
+</div>
+
+
+
+<div class="duoshuo">
+	<!-- 多说评论框 start -->
+	<div class="ds-thread" data-thread-key="使用Spring构建一个 RESTful Web Service" data-title="使用Spring构建一个 RESTful Web Service" data-url="chensunhao@github.io/2015/08/04/使用Spring构建一个 RESTful Web Service/"></div>
+	<!-- 多说评论框 end -->
+	<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+	<script type="text/javascript">
+	var duoshuoQuery = {short_name:"true"};
+	(function() {
+		var ds = document.createElement('script');
+		ds.type = 'text/javascript';ds.async = true;
+		ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+		ds.charset = 'UTF-8';
+		(document.getElementsByTagName('head')[0] 
+		 || document.getElementsByTagName('body')[0]).appendChild(ds);
+	})();
+	</script>
+	<!-- 多说公共JS代码 end -->
+</div>
+
+
+
+
+</div>
+      <footer id="footer">
+  <div class="outer">
+    <div id="footer-info">
+    	<div class="footer-left">
+    		&copy; 2015 沉寂头颅
+    	</div>
+      	<div class="footer-right">
+      		<a href="http://hexo.io/" target="_blank">Hexo</a>  Theme <a href="https://github.com/litten/hexo-theme-yilia" target="_blank">Yilia</a> by Litten
+      	</div>
+    </div>
+  </div>
+</footer>
+    </div>
+    
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css" type="text/css">
+
+
+<script>
+	var yiliaConfig = {
+		fancybox: true,
+		mathjax: true,
+		animate: true,
+		isHome: false,
+		isPost: true,
+		isArchive: false,
+		isTag: false,
+		isCategory: false,
+		open_in_new: false
+	}
+</script>
+<script src="http://7.url.cn/edu/jslib/comb/require-2.1.6,jquery-1.9.1.min.js" type="text/javascript"></script>
+<script src="/js/main.js" type="text/javascript"></script>
+
+
+
+
+
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+        processEscapes: true,
+        skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    }
+});
+
+MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for(i=0; i < all.length; i += 1) {
+        all[i].SourceElement().parentNode.className += ' has-jax';                 
+    }       
+});
+</script>
+
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+  </div>
+</body>
+</html>
